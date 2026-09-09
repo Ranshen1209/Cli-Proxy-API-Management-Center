@@ -1007,7 +1007,13 @@
           "timeout": "Timeout",
           "stabilize_device": "Stabilize Device Profile",
           "stabilize_device_desc": "Pin OS/Arch and stabilize the software fingerprint per credential/API key",
-          "beta_features": "Beta Features"
+          "beta_features": "Beta Features",
+          "codex_fingerprint_convergence": "Fingerprint convergence",
+          "codex_fingerprint_convergence_hint": "Default off. Device pins installation ID per credential; session also derives session/thread/turn IDs; full also collapses subagent threads. Saved through the typed Management API.",
+          "codex_fingerprint_off": "Off",
+          "codex_fingerprint_device": "Device",
+          "codex_fingerprint_session": "Session",
+          "codex_fingerprint_full": "Full"
         },
         "network": {
           "title": "Network Configuration",

@@ -1006,7 +1006,13 @@
           "timeout": "Timeout",
           "stabilize_device": "Стабилизировать профиль устройства",
           "stabilize_device_desc": "Фиксировать OS/Arch и стабилизировать программный отпечаток для учётных данных/API-ключа",
-          "beta_features": "Beta Features"
+          "beta_features": "Beta Features",
+          "codex_fingerprint_convergence": "Сходимость отпечатка",
+          "codex_fingerprint_convergence_hint": "По умолчанию off. Device фиксирует installation ID на учётную запись; session также выводит session/thread/turn; full также сворачивает потоки субагентов. Сохраняется через typed Management API.",
+          "codex_fingerprint_off": "Off",
+          "codex_fingerprint_device": "Device",
+          "codex_fingerprint_session": "Session",
+          "codex_fingerprint_full": "Full"
         },
         "network": {
           "title": "Сетевые настройки",

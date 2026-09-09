@@ -409,6 +409,15 @@ export const CONFIG_FIELD_SEARCH_INDEX: ConfigFieldSearchEntry[] = [
   },
   // Codex header defaults.
   {
+    fieldId: 'codexFingerprintConvergence',
+    sectionId: 'advanced',
+    labelKey: L('sections.headers.codex_fingerprint_convergence'),
+    qualifierKey: L('sections.headers.codex_title'),
+    hintKey: L('sections.headers.codex_fingerprint_convergence_hint'),
+    yamlKeys: ['codex', 'fingerprint-convergence'],
+    keywords: ['codex', 'fingerprint', 'convergence', 'session', 'device'],
+  },
+  {
     fieldId: 'codexHeaderUserAgent',
     sectionId: 'advanced',
     labelKey: L('sections.headers.user_agent'),

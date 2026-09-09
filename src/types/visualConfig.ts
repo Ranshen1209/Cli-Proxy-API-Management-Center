@@ -1,6 +1,7 @@
 export type PayloadParamValueType = 'string' | 'number' | 'boolean' | 'json';
 export type DisableImageGenerationMode = 'false' | 'true' | 'chat' | 'passthrough';
 export type RoutingStrategy = 'round-robin' | 'weighted-round-robin' | 'fill-first';
+export type CodexFingerprintConvergenceMode = 'off' | 'device' | 'session' | 'full';
 export type PluginStoreAuthType = 'none' | 'bearer' | 'basic' | 'header' | 'github-token';
 export type PluginStoreAuthApplyTo = 'registry' | 'metadata' | 'artifact';
 export type PayloadParamValidationErrorCode =
@@ -132,6 +133,7 @@ export type VisualConfigValues = {
   claudeHeaderArch: string;
   claudeHeaderTimeout: string;
   claudeHeaderStabilizeDeviceProfile: boolean;
+  codexFingerprintConvergence: CodexFingerprintConvergenceMode;
   codexHeaderUserAgent: string;
   codexHeaderBetaFeatures: string;
   payloadDefaultRules: PayloadRule[];
@@ -197,6 +199,7 @@ export const DEFAULT_VISUAL_VALUES: VisualConfigValues = {
   claudeHeaderArch: '',
   claudeHeaderTimeout: '',
   claudeHeaderStabilizeDeviceProfile: false,
+  codexFingerprintConvergence: 'off',
   codexHeaderUserAgent: '',
   codexHeaderBetaFeatures: '',
   payloadDefaultRules: [],

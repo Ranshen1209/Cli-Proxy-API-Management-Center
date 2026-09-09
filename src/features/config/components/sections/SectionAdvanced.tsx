@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Collapsible } from '@/components/ui/Collapsible';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import type { PluginStoreAuthRule } from '@/types/visualConfig';
 import { CONFIG_TAB_ICONS, SECTION_INDEX_LABELS } from '../../constants';
 import type { ConfigSectionProps } from '../../types';
@@ -25,6 +26,8 @@ const Icon = CONFIG_TAB_ICONS.advanced;
 /** 06 高级与实验：插件源（只存 env 变量名）、签名缓存、Claude/Codex 请求头默认值。 */
 export function SectionAdvanced({ values, disabled, animateIn, onChange }: ConfigSectionProps) {
   const { t } = useTranslation();
+  const fingerprintLabelId = useId();
+  const fingerprintHintId = `${fingerprintLabelId}-hint`;
 
   const handlePluginStoreSourcesChange = useCallback(
     (pluginStoreSources: string[]) => onChange({ pluginStoreSources }),
@@ -260,6 +263,56 @@ export function SectionAdvanced({ values, disabled, animateIn, onChange }: Confi
             <Divider />
             <FieldGroupHeading title={t('config_management.visual.sections.headers.codex_title')} />
             <FieldGrid>
+              <FieldAnchor fieldId="codexFingerprintConvergence">
+                <FieldShell
+                  label={t('config_management.visual.sections.headers.codex_fingerprint_convergence')}
+                  labelId={fingerprintLabelId}
+                  hint={t(
+                    'config_management.visual.sections.headers.codex_fingerprint_convergence_hint'
+                  )}
+                  hintId={fingerprintHintId}
+                >
+                  <Select
+                    value={values.codexFingerprintConvergence}
+                    options={[
+                      {
+                        value: 'off',
+                        label: t(
+                          'config_management.visual.sections.headers.codex_fingerprint_off'
+                        ),
+                      },
+                      {
+                        value: 'device',
+                        label: t(
+                          'config_management.visual.sections.headers.codex_fingerprint_device'
+                        ),
+                      },
+                      {
+                        value: 'session',
+                        label: t(
+                          'config_management.visual.sections.headers.codex_fingerprint_session'
+                        ),
+                      },
+                      {
+                        value: 'full',
+                        label: t(
+                          'config_management.visual.sections.headers.codex_fingerprint_full'
+                        ),
+                      },
+                    ]}
+                    id={`${fingerprintLabelId}-select`}
+                    disabled={disabled}
+                    ariaLabelledBy={fingerprintLabelId}
+                    ariaDescribedBy={fingerprintHintId}
+                    onChange={(nextValue) =>
+                      onChange({
+                        codexFingerprintConvergence:
+                          nextValue as typeof values.codexFingerprintConvergence,
+                      })
+                    }
+                  />
+                </FieldShell>
+              </FieldAnchor>
               <FieldAnchor fieldId="codexHeaderUserAgent">
                 <Input
                   label={t('config_management.visual.sections.headers.user_agent')}

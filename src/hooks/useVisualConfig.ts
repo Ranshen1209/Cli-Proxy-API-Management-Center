@@ -14,8 +14,10 @@ import type {
   VisualConfigValues,
   VisualConfigValidationErrors,
   PayloadParamValidationErrorCode,
+  CodexFingerprintConvergenceMode,
 } from '@/types/visualConfig';
 import { DEFAULT_VISUAL_VALUES } from '@/types/visualConfig';
+import { configApi } from '@/services/api/config';
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return null;
@@ -442,6 +444,19 @@ export function parseRoutingStrategy(raw: unknown): RoutingStrategy {
   }
   if (['fill-first', 'fillfirst', 'ff'].includes(normalized)) return 'fill-first';
   return 'round-robin';
+}
+
+export function parseCodexFingerprintConvergence(raw: unknown): CodexFingerprintConvergenceMode {
+  const normalized = String(raw ?? '')
+    .trim()
+    .toLowerCase();
+  if (normalized === 'device' || normalized === 'session' || normalized === 'full') {
+    return normalized;
+  }
+  if (['', 'off', 'none', 'disabled', 'false'].includes(normalized)) {
+    return 'off';
+  }
+  return 'off';
 }
 
 export function parseDisableImageGenerationMode(raw: unknown): DisableImageGenerationMode {
@@ -889,6 +904,7 @@ function getNextDirtyFields(
       'claudeHeaderArch',
       'claudeHeaderTimeout',
       'claudeHeaderStabilizeDeviceProfile',
+      'codexFingerprintConvergence',
       'codexHeaderUserAgent',
       'codexHeaderBetaFeatures',
       'host',
@@ -1084,6 +1100,7 @@ export function useVisualConfig() {
       const antigravity = asRecord(parsed.antigravity);
       const claudeHeaderDefaults = asRecord(parsed['claude-header-defaults']);
       const codexHeaderDefaults = asRecord(parsed['codex-header-defaults']);
+      const codex = asRecord(parsed.codex);
 
       const newValues: VisualConfigValues = {
         host: typeof parsed.host === 'string' ? parsed.host : '',
@@ -1162,6 +1179,9 @@ export function useVisualConfig() {
           typeof claudeHeaderDefaults?.timeout === 'string' ? claudeHeaderDefaults.timeout : '',
         claudeHeaderStabilizeDeviceProfile: Boolean(
           claudeHeaderDefaults?.['stabilize-device-profile']
+        ),
+        codexFingerprintConvergence: parseCodexFingerprintConvergence(
+          codex?.['fingerprint-convergence']
         ),
         codexHeaderUserAgent:
           typeof codexHeaderDefaults?.['user-agent'] === 'string'
@@ -1450,6 +1470,12 @@ export function useVisualConfig() {
           deleteIfMapEmpty(doc, ['claude-header-defaults']);
         }
 
+        if (dirtyFields.has('codexFingerprintConvergence')) {
+          ensureMapInDoc(doc, ['codex']);
+          setStringInDoc(doc, ['codex', 'fingerprint-convergence'], values.codexFingerprintConvergence);
+          deleteIfMapEmpty(doc, ['codex']);
+        }
+
         const codexHeadersDirty =
           dirtyFields.has('codexHeaderUserAgent') || dirtyFields.has('codexHeaderBetaFeatures');
         if (codexHeadersDirty) {
@@ -1605,6 +1631,11 @@ export function useVisualConfig() {
     [dirtyFields, visualValues]
   );
 
+  const persistTypedFields = useCallback(async () => {
+    if (!dirtyFields.has('codexFingerprintConvergence')) return;
+    await configApi.updateCodexFingerprintConvergence(visualValues.codexFingerprintConvergence);
+  }, [dirtyFields, visualValues.codexFingerprintConvergence]);
+
   const setVisualValues = useCallback((newValues: Partial<VisualConfigValues>) => {
     dispatch({ type: 'set_values', values: newValues });
   }, []);
@@ -1619,6 +1650,7 @@ export function useVisualConfig() {
     visualHasPayloadValidationErrors,
     loadVisualValuesFromYaml,
     applyVisualChangesToYaml,
+    persistTypedFields,
     setVisualValues,
   };
 }

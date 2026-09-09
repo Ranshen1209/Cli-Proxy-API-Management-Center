@@ -1007,7 +1007,13 @@
           "timeout": "Timeout",
           "stabilize_device": "稳定设备指纹",
           "stabilize_device_desc": "固定 OS/Arch，并按凭据/API Key 稳定软件指纹",
-          "beta_features": "Beta Features"
+          "beta_features": "Beta Features",
+          "codex_fingerprint_convergence": "指纹收敛",
+          "codex_fingerprint_convergence_hint": "默认 off。device 按凭据固定 installation ID；session 再派生 session/thread/turn；full 再折叠子代理线程。通过 typed Management API 保存。",
+          "codex_fingerprint_off": "Off",
+          "codex_fingerprint_device": "Device",
+          "codex_fingerprint_session": "Session",
+          "codex_fingerprint_full": "Full"
         },
         "network": {
           "title": "网络配置",

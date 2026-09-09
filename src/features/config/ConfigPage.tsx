@@ -67,6 +67,7 @@ export function ConfigPage() {
     visualHasPayloadValidationErrors,
     loadVisualValuesFromYaml,
     applyVisualChangesToYaml,
+    persistTypedFields,
     setVisualValues,
   } = useVisualConfig();
 
@@ -94,6 +95,7 @@ export function ConfigPage() {
     visualParseError,
     loadVisualValuesFromYaml,
     applyVisualChangesToYaml,
+    persistTypedFields,
   });
   const sourceSearch = useSourceSearch();
 

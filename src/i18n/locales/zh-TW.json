@@ -1033,7 +1033,13 @@
           "timeout": "Timeout",
           "stabilize_device": "穩定設備指紋",
           "stabilize_device_desc": "固定 OS/Arch，並按憑證/API Key 穩定軟體指紋",
-          "beta_features": "Beta Features"
+          "beta_features": "Beta Features",
+          "codex_fingerprint_convergence": "指紋收斂",
+          "codex_fingerprint_convergence_hint": "預設 off。device 依憑證固定 installation ID；session 再派生 session/thread/turn；full 再摺疊子代理執行緒。透過 typed Management API 儲存。",
+          "codex_fingerprint_off": "Off",
+          "codex_fingerprint_device": "Device",
+          "codex_fingerprint_session": "Session",
+          "codex_fingerprint_full": "Full"
         },
         "network": {
           "title": "網路設定",

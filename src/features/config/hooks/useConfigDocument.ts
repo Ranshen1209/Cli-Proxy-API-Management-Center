@@ -36,6 +36,7 @@ export type UseConfigDocumentArgs = {
   visualParseError: string | null;
   loadVisualValuesFromYaml: (yaml: string) => { ok: true } | { ok: false; error: string };
   applyVisualChangesToYaml: (yaml: string) => string;
+  persistTypedFields?: () => Promise<void>;
 };
 
 export function useConfigDocument({
@@ -44,6 +45,7 @@ export function useConfigDocument({
   visualParseError,
   loadVisualValuesFromYaml,
   applyVisualChangesToYaml,
+  persistTypedFields,
 }: UseConfigDocumentArgs) {
   const { t } = useTranslation();
   const showNotification = useNotificationStore((state) => state.showNotification);
@@ -119,6 +121,9 @@ export function useConfigDocument({
       const commercialModeChanged = previousCommercialMode !== nextCommercialMode;
 
       await configFileApi.saveConfigYaml(mergedYaml);
+      if (persistTypedFields) {
+        await persistTypedFields();
+      }
       const latestContent = await configFileApi.fetchConfigYaml();
       setDirty(false);
       setDiffModalOpen(false);
@@ -160,6 +165,7 @@ export function useConfigDocument({
     dirty,
     loadVisualValuesFromYaml,
     mergedYaml,
+    persistTypedFields,
     previewMode,
     previewServerYaml,
     showNotification,
