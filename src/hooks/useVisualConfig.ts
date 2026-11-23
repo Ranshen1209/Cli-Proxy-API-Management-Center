@@ -459,6 +459,60 @@ export function parseCodexFingerprintConvergence(raw: unknown): CodexFingerprint
   return 'off';
 }
 
+export function readCodexFingerprintConvergenceFromConfig(
+  parsed: Record<string, unknown>
+): CodexFingerprintConvergenceMode {
+  const oauth = asRecord(parsed.oauth);
+  const oauthProviders = asRecord(oauth?.providers);
+  const v8Codex = asRecord(oauthProviders?.codex);
+  if (v8Codex && Object.prototype.hasOwnProperty.call(v8Codex, 'fingerprint-convergence')) {
+    return parseCodexFingerprintConvergence(v8Codex['fingerprint-convergence']);
+  }
+  const codex = asRecord(parsed.codex);
+  return parseCodexFingerprintConvergence(codex?.['fingerprint-convergence']);
+}
+
+export function applyCodexFingerprintConvergenceToYaml(
+  yamlContent: string,
+  value: CodexFingerprintConvergenceMode
+): string {
+  const doc = parseDocument(yamlContent);
+  if (doc.errors.length > 0) return yamlContent;
+  if (!isMap(doc.contents)) {
+    doc.contents = doc.createNode({}) as unknown as typeof doc.contents;
+  }
+  writeCodexFingerprintConvergenceToDoc(doc, value);
+  return doc.toString({ indent: 2, lineWidth: 120, minContentWidth: 0 });
+}
+
+function writeCodexFingerprintConvergenceToDoc(
+  doc: YamlDocument,
+  value: CodexFingerprintConvergenceMode
+): void {
+  const useV8Path =
+    docHas(doc, ['oauth', 'providers', 'codex']) ||
+    (docHas(doc, ['oauth', 'providers']) && !docHas(doc, ['codex']));
+  if (useV8Path) {
+    ensureMapInDoc(doc, ['oauth']);
+    ensureMapInDoc(doc, ['oauth', 'providers']);
+    ensureMapInDoc(doc, ['oauth', 'providers', 'codex']);
+    setStringInDoc(doc, ['oauth', 'providers', 'codex', 'fingerprint-convergence'], value);
+    deleteIfMapEmpty(doc, ['oauth', 'providers', 'codex']);
+    deleteIfMapEmpty(doc, ['oauth', 'providers']);
+    deleteIfMapEmpty(doc, ['oauth']);
+    return;
+  }
+  ensureMapInDoc(doc, ['codex']);
+  setStringInDoc(doc, ['codex', 'fingerprint-convergence'], value);
+  deleteIfMapEmpty(doc, ['codex']);
+}
+
+export function shouldPersistOnlyTypedCodexFingerprintConvergence(
+  dirtyFields: ReadonlySet<string>
+): boolean {
+  return dirtyFields.size === 1 && dirtyFields.has('codexFingerprintConvergence');
+}
+
 export function parseDisableImageGenerationMode(raw: unknown): DisableImageGenerationMode {
   if (raw === true) return 'true';
   if (typeof raw === 'string') {
@@ -1100,7 +1154,6 @@ export function useVisualConfig() {
       const antigravity = asRecord(parsed.antigravity);
       const claudeHeaderDefaults = asRecord(parsed['claude-header-defaults']);
       const codexHeaderDefaults = asRecord(parsed['codex-header-defaults']);
-      const codex = asRecord(parsed.codex);
 
       const newValues: VisualConfigValues = {
         host: typeof parsed.host === 'string' ? parsed.host : '',
@@ -1180,9 +1233,7 @@ export function useVisualConfig() {
         claudeHeaderStabilizeDeviceProfile: Boolean(
           claudeHeaderDefaults?.['stabilize-device-profile']
         ),
-        codexFingerprintConvergence: parseCodexFingerprintConvergence(
-          codex?.['fingerprint-convergence']
-        ),
+        codexFingerprintConvergence: readCodexFingerprintConvergenceFromConfig(parsed),
         codexHeaderUserAgent:
           typeof codexHeaderDefaults?.['user-agent'] === 'string'
             ? codexHeaderDefaults['user-agent']
@@ -1471,9 +1522,7 @@ export function useVisualConfig() {
         }
 
         if (dirtyFields.has('codexFingerprintConvergence')) {
-          ensureMapInDoc(doc, ['codex']);
-          setStringInDoc(doc, ['codex', 'fingerprint-convergence'], values.codexFingerprintConvergence);
-          deleteIfMapEmpty(doc, ['codex']);
+          writeCodexFingerprintConvergenceToDoc(doc, values.codexFingerprintConvergence);
         }
 
         const codexHeadersDirty =

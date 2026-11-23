@@ -92,6 +92,7 @@ export function ConfigPage() {
   const doc = useConfigDocument({
     mode,
     visualDirty,
+    visualDirtyFields,
     visualParseError,
     loadVisualValuesFromYaml,
     applyVisualChangesToYaml,

@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { parse as parseYaml, parseDocument } from 'yaml';
 import { useConfigStore, useNotificationStore } from '@/stores';
 import { configFileApi } from '@/services/api/configFile';
+import { shouldPersistOnlyTypedCodexFingerprintConvergence } from '@/hooks/useVisualConfig';
 import type { ConfigEditorMode } from '../constants';
 
 function readCommercialModeFromYaml(yamlContent: string): boolean {
@@ -33,6 +34,7 @@ export type UseConfigDocumentArgs = {
   /** 当前编辑模式（旧实现中的 activeTab）。 */
   mode: ConfigEditorMode;
   visualDirty: boolean;
+  visualDirtyFields?: ReadonlySet<string>;
   visualParseError: string | null;
   loadVisualValuesFromYaml: (yaml: string) => { ok: true } | { ok: false; error: string };
   applyVisualChangesToYaml: (yaml: string) => string;
@@ -42,6 +44,7 @@ export type UseConfigDocumentArgs = {
 export function useConfigDocument({
   mode,
   visualDirty,
+  visualDirtyFields,
   visualParseError,
   loadVisualValuesFromYaml,
   applyVisualChangesToYaml,
@@ -120,9 +123,16 @@ export function useConfigDocument({
       const nextCommercialMode = readCommercialModeFromYaml(mergedYaml);
       const commercialModeChanged = previousCommercialMode !== nextCommercialMode;
 
-      await configFileApi.saveConfigYaml(mergedYaml);
-      if (persistTypedFields) {
+      const onlyTypedFieldChanged =
+        previewMode === 'visual' &&
+        !dirty &&
+        Boolean(persistTypedFields) &&
+        Boolean(visualDirtyFields && shouldPersistOnlyTypedCodexFingerprintConvergence(visualDirtyFields));
+
+      if (onlyTypedFieldChanged && persistTypedFields) {
         await persistTypedFields();
+      } else {
+        await configFileApi.saveConfigYaml(mergedYaml);
       }
       const latestContent = await configFileApi.fetchConfigYaml();
       setDirty(false);
@@ -170,6 +180,7 @@ export function useConfigDocument({
     previewServerYaml,
     showNotification,
     t,
+    visualDirtyFields,
   ]);
 
   const handleSave = useCallback(async () => {
